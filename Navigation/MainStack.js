@@ -13,8 +13,8 @@ function MainStack() {
     return (
         <NavigationContainer>
             <Stack.Navigator>
-                <Stack.Screen name="login" component={LoginScreen}/>
-                <Stack.Screen name="register" component={RegisterScreen}/>
+                <Stack.Screen name="login" component={LoginScreen} />
+                <Stack.Screen name="register" component={RegisterScreen} options={{headerShown:false}}/>
                 <Stack.Screen name="Toma una ruta" component={Home}/>
                 <Stack.Screen name="Perfil" component={Profile}/>
                 <Stack.Screen name="Contactos" component={Contacts}/>

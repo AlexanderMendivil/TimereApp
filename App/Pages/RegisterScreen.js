@@ -1,12 +1,23 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-native"
 import { StatusBar } from 'expo-status-bar';
+import { auth } from '../model/firebase';
+import { useNavigation } from '@react-navigation/core';
 
-export function RegisterScreen({navigation}) {
+export function RegisterScreen() {
 
-    // const [email, setEmail] = useState("")
-    // const [password, setPassword] = useState("")
-
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const navigation = useNavigation()
+    
+    const handleSignUp = () =>{
+        auth.createUserWithEmailAndPassword(email, password)
+        .then(credentials =>{
+            console.log(credentials.user.email)
+            navigation.navigate("login")
+        })
+        .catch(err => alert(err.message))
+    }
     return (
         <View style={styles.container}>
         <View style={styles.logoContainer}>
@@ -17,14 +28,14 @@ export function RegisterScreen({navigation}) {
         </View>
         <View style={styles.formContaier}>
             <Text>Email:</Text>
-            <TextInput style={styles.input} placeholder="ejemplo@outlook.com"></TextInput>
+            <TextInput style={styles.input} placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
             <Text>Nombre:</Text>
             <TextInput style={styles.input} placeholder="Nombre"></TextInput>
             <Text>Contraseña:</Text>
-            <TextInput style={styles.input} placeholder="minimo 8 caracteres"></TextInput>
+            <TextInput style={styles.input} secureTextEntry placeholder="minimo 6 caracteres" onChangeText={(text)=>setPassword(text)}></TextInput>
         </View>
         <View style={styles.account}>
-            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Toma una ruta")}><Text style={styles.buttonText}>Registrate</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSignUp}><Text style={styles.buttonText}>Registrate</Text></TouchableOpacity>
             <View style={styles.login}>
             <Text style={styles.subtext}>¿Ya tienes cuenta?</Text>
             <Text style={styles.register} onPress={()=>navigation.navigate("login")}>Log in</Text>

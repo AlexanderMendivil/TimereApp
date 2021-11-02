@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, Image, StyleSheet, Dimensions, TextInput,TouchableOpacity} from "react-native"
+import {View, Text, Image, StyleSheet, Dimensions, TextInput,TouchableOpacity, ScrollView} from "react-native"
 import {StatusBar} from "expo-status-bar"
 import MapView, {PROVIDER_GOOGLE, Marker, Polyline, Polygon} from "react-native-maps"
 // import MapViewDirections from 'react-native-maps-directions';
@@ -37,7 +37,8 @@ export function Home({navigation}) {
         <Image style={styles.image} source={require('../assets/foto_perfil.jpeg')}></Image>
         </View>
       </View>
-      <MapViewDireccions style={styles.map} provider={PROVIDER_GOOGLE}
+
+      <MapView style={styles.map} provider={PROVIDER_GOOGLE}
        region={{
         latitude: location.coords.latitude,
          longitude: location.coords.longitude,
@@ -45,7 +46,7 @@ export function Home({navigation}) {
          longitudeDelta:0.002,
          }
          }
-          >
+         >
             <Polygon
             coordinates={[
               {latitude:location.coords.latitude,longitude:location.coords.longitude},
@@ -54,7 +55,7 @@ export function Home({navigation}) {
             lineCap='square'
             />
             <Marker coordinate={{latitude:location.coords.latitude,longitude:location.coords.longitude}} title="Mi locación"/>
-          </MapViewDireccions>
+          </MapView>
       <View style={styles.destino}>
         <Text style={styles.textD}>Marca el punto de destino:</Text>
         <TextInput style={styles.input} placeholder="Punto destino"/>

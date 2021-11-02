@@ -2,8 +2,22 @@ import React from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions} from "react-native"
 import { StatusBar } from 'expo-status-bar';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
-export function Profile({navigation}) {
+import { auth } from '../model/firebase';
+import { useNavigation } from '@react-navigation/core';
 
+export function Profile() {
+
+    const navigation = useNavigation()
+    const logOut = () =>{
+        auth.signOut()
+        .then(()=>{
+            navigation.reset({
+                index:0,
+                routes: [{name:"login"}]
+            })
+        })
+        .catch(err => alert(err.message))
+    }
 
     return (
         <View style={styles.container}>
@@ -18,11 +32,17 @@ export function Profile({navigation}) {
                 <TextInput style={styles.input} placeholder="Maria Jose Gonzalez Vasquez"/>
                 <Text>Email:</Text>
                 <TextInput style={styles.input} placeholder="ejemplo@outlook.com"/>
-                <Text>Contraseña:</Text>
-                <TextInput style={styles.input} placeholder="minimo 8 caracteres"/>
+                <Text>Numer de telefono:</Text>
+                <TextInput style={styles.input} />
             </View>
             <View style={styles.account}>
-                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Toma una ruta")}><Text style={styles.buttonText}>Guardar</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Toma una ruta")}>
+                    <Text style={styles.buttonText}>Guardar</Text>
+                    </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button} onPress={logOut}>
+                    <Text style={styles.buttonText}>Logout</Text>
+                    </TouchableOpacity>
             </View>
 
             <View style={styles.menu}>
@@ -32,7 +52,7 @@ export function Profile({navigation}) {
             </View>
         </View>
     );
-
+    
 }
 const styles = StyleSheet.create({
     container:{
@@ -76,6 +96,7 @@ const styles = StyleSheet.create({
         height: 40,
         width:115,
         marginBottom:10,
+        marginLeft: 35,
         borderRadius:5,
         justifyContent: 'center',
         alignItems: 'center'
@@ -84,6 +105,7 @@ const styles = StyleSheet.create({
         color: '#ffff',
     },
     account:{
+        flexDirection:"row",
         justifyContent:'center',
         alignItems: 'center',
         marginTop: -170

@@ -1,12 +1,29 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-native"
 import { StatusBar } from 'expo-status-bar';
+import { auth } from '../model/firebase';
+import { useNavigation } from '@react-navigation/core';
 
-export function LoginScreen({navigation}) {
+export function LoginScreen() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
-
+    const navigation = useNavigation()
+    useEffect(()=>{
+        const unsubscribe = auth.onAuthStateChanged(user=>{
+          if(user){
+                navigation.replace("Toma una ruta")            
+          }
+    
+        })
+        return unsubscribe
+      },[])
+    
+    const handleLogIn = () =>{
+        auth.signInWithEmailAndPassword(email, password)
+        .then()
+        .catch(err=>alert(err.message))
+    }
     return (
         <View style={styles.container}>
         <View style={styles.logoContainer}>
@@ -17,12 +34,12 @@ export function LoginScreen({navigation}) {
         </View>
         <View style={styles.formContaier}>
             <Text>Email:</Text>
-            <TextInput style={styles.input} placeholder="ejemplo@outlook.com"></TextInput>
+            <TextInput style={styles.input} placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
             <Text>Contraseña:</Text>
-            <TextInput style={styles.input} placeholder="minimo 8 caracteres"></TextInput>
+            <TextInput style={styles.input} secureTextEntry placeholder="minimo 6 caracteres" onChangeText={(text)=>setPassword(text)}></TextInput>
         </View>
         <View style={styles.account}>
-            <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Toma una ruta")}><Text style={styles.buttonText}>Log in</Text></TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleLogIn}><Text style={styles.buttonText}>Log in</Text></TouchableOpacity>
             <Text style={styles.subtext}>¿No tienes cuenta?</Text>
             <Text style={styles.register} onPress={()=>navigation.navigate("register")}>Registrate</Text>
         </View>
