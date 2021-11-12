@@ -3,6 +3,7 @@ import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-n
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
+import { SignUp } from '../controler/registerController';
 
 export function RegisterScreen() {
 
@@ -11,8 +12,8 @@ export function RegisterScreen() {
     const navigation = useNavigation()
     
     const handleSignUp = () =>{
-        auth.createUserWithEmailAndPassword(email, password)
-        .then(credentials =>{
+        let register = SignUp (email, password)
+        register.then(credentials =>{
             console.log(credentials.user.email)
             navigation.navigate("login")
         })
