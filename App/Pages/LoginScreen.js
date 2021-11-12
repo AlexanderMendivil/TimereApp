@@ -3,6 +3,7 @@ import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-n
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
+import { logIn } from '../controler/loginController';
 
 export function LoginScreen() {
 
@@ -20,9 +21,9 @@ export function LoginScreen() {
       },[])
     
     const handleLogIn = () =>{
-        auth.signInWithEmailAndPassword(email, password)
-        .then()
-        .catch(err=>alert(err.message))
+        let login = logIn(email, password)
+        login .then()
+        .catch(err=>err.message)
     }
     return (
         <View style={styles.container}>
