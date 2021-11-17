@@ -5,7 +5,22 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "eject": "expo eject"
+    "eject": "expo eject",
+    "test": "jest"
+  },
+  "jest": {
+    
+    "rootDir": ".",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
+    ],
+    "moduleNameMapper": {
+      "^react-native$": "react-native-web"
+  }
+
   },
   "dependencies": {
     "@react-navigation/native": "^6.0.5",
@@ -26,7 +41,9 @@
     "react-native-web": "~0.13.12"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.12.9",
+    "jest-expo": "^43.0.1",
+    "react-test-renderer": "^17.0.2"
   },
   "private": true
 }
