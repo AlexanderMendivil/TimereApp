@@ -3,18 +3,27 @@ import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-n
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
-import { SignUp } from '../controler/registerController';
+import { createUser, SignUp } from '../controler/registerController';
+import { User } from '../model/user';
 
 export function RegisterScreen() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [name, setName] = useState("")
     const navigation = useNavigation()
     
     const handleSignUp = () =>{
+
         let register = SignUp (email, password)
         register.then(credentials =>{
-            console.log(credentials.user.email)
+            const myUser = new User(email,credentials.user.uid,name,"")
+            const myUserObject = JSON.parse(JSON.stringify(myUser))
+            
+            createUser(credentials.user.uid, myUserObject )
+            .then(()=>console.log("usuario registrado"))
+            .catch(e => console.log(e.message))
+
             navigation.navigate("login")
         })
         .catch(err => alert(err.message))
@@ -31,7 +40,7 @@ export function RegisterScreen() {
             <Text>Email:</Text>
             <TextInput style={styles.input} placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
             <Text>Nombre:</Text>
-            <TextInput style={styles.input} placeholder="Nombre"></TextInput>
+            <TextInput style={styles.input} onChangeText={(text)=>setName(text)} placeholder="Nombre"></TextInput>
             <Text>Contraseña:</Text>
             <TextInput style={styles.input} secureTextEntry placeholder="minimo 6 caracteres" onChangeText={(text)=>setPassword(text)}></TextInput>
         </View>

@@ -22,7 +22,7 @@ export function LoginScreen() {
     
     const handleLogIn = () =>{
         let login = logIn(email, password)
-        login .then()
+        login .then(credentials => console.log(credentials.user.uid))
         .catch(err=>err.message)
     }
     return (
