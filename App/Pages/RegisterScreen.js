@@ -5,18 +5,25 @@ import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
 import { createUser, SignUp } from '../controler/registerController';
 import { User } from '../model/user';
+import {useDispatch} from "react-redux"
+import {getUser} from '../actions/user_actions'
+
 
 export function RegisterScreen() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [name, setName] = useState("")
-    const navigation = useNavigation()
     
+    const navigation = useNavigation()
+    const dispatch = useDispatch()
+    const getUserId = (userId) => dispatch(getUser(userId))
+
     const handleSignUp = () =>{
 
         let register = SignUp (email, password)
         register.then(credentials =>{
+            getUserId(credentials.user.uid)
             const myUser = new User(email,credentials.user.uid,name,"")
             const myUserObject = JSON.parse(JSON.stringify(myUser))
             
