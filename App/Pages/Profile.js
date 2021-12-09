@@ -6,16 +6,34 @@ import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
 import { useSelector } from 'react-redux';
 import {getActualUser} from "../controler/profileController"
+import * as ImagePicker from "expo-image-picker"
 
 export function Profile() {
 
     const [email, setEmail] = useState("")
     const [name, setName] = useState("")
     const [phoneNumber, setPhoneNumber] = useState("")
+    const [image, setImage] = useState({})
 
     const navigation = useNavigation()
     const userId = useSelector(state => state.userRedux.userId)
     
+    const openImagePicker = async () =>{
+        let permissionResult = await ImagePicker.requestCameraPermissionsAsync()
+
+        if(permissionResult.granted == false){
+            alert("Permission was denied")
+            return
+        }
+
+        let pickerResult = await ImagePicker.launchImageLibraryAsync()
+        
+        if(pickerResult.cancelled === true){
+            return
+        }
+
+        setImage({localUri: pickerResult.uri})
+    }    
     useEffect(()=>{
         console.log(getUser())
     },[])
@@ -28,7 +46,7 @@ export function Profile() {
             setPhoneNumber(users.data()["phoneNumber"])
         }).catch(err => console.log(err))
     }
-    
+     
 
     const logOut = () =>{
         auth.signOut()
@@ -45,8 +63,9 @@ export function Profile() {
         <View style={styles.container}>
             <Text style={styles.subtext}>Aquí puedes ver y modificar la información de tu perfil.</Text>    
             <View style={styles.logoContainer}>
-                <Image style={styles.logo} source={require('../assets/foto_perfil.jpeg')}/>
-                <FontAwesome5 name="camera" color="#FF3131" size={30} iconStyle={{marginRight: 20}}/>
+                <Image style={styles.logo} source={
+                    image.localUri == null ? require("../assets/foto_perfil.jpeg") : {uri: image.localUri}}/>
+                <FontAwesome5 name="camera" color="#FF3131" size={30} iconStyle={{marginRight: 20}} onPress={openImagePicker}/>
                 <StatusBar style="auto"/>
             </View>
             <View style={styles.formContaier}>
@@ -54,7 +73,7 @@ export function Profile() {
                 <TextInput style={styles.input} placeholder="Nombre" value={name} onChangeText={setName}/>
                 <Text>Email:</Text>
                 <TextInput style={styles.input} placeholder="ejemplo@outlook.com" value={email} onChangeText={setEmail}/>
-                <Text>Numer de telefono:</Text>
+                <Text>Numero de telefono:</Text>
                 <TextInput style={styles.input}  value={phoneNumber} onChangeText={setPhoneNumber}/>
             </View>
             <View style={styles.account}>
