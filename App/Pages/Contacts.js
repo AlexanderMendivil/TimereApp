@@ -48,7 +48,7 @@ export function Contacts({navigation}) {
 const styles = StyleSheet.create({
     container:{
         flex: 1,
-        justifyContent:'center',
+        // justifyContent:'center',
         alignItems:'center'
     },
     contactContainer:{
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
         width:'80%',
         flexDirection:'row',
         alignItems: 'flex-end',
-        justifyContent:'center',
+        // justifyContent:'center',
         marginTop:10,
         borderBottomColor:'#787272',
         borderBottomWidth:1
@@ -103,14 +103,14 @@ const styles = StyleSheet.create({
     buttonText:{
         color: '#ffff',
     },
-    account:{
-        justifyContent:'center',
-        alignItems: 'center',
-        // marginTop: -50
-    },
-    register:{
-        color:'#FF3131'
-    },
+    // account:{
+    //     justifyContent:'center',
+    //     alignItems: 'center',
+    //     // marginTop: -50
+    // },
+    // register:{
+    //     color:'#FF3131'
+    // },
     menu:{
         flex:1,
         width:Dimensions.get("window").width,
