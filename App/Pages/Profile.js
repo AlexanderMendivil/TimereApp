@@ -1,13 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions} from "react-native"
 import { StatusBar } from 'expo-status-bar';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
+import { useSelector } from 'react-redux';
+import {getActualUser} from "../controler/profileController"
 
 export function Profile() {
 
+    const [email, setEmail] = useState("")
+    const [name, setName] = useState("")
+    const [phoneNumber, setPhoneNumber] = useState("")
+
     const navigation = useNavigation()
+    const userId = useSelector(state => state.userRedux.userId)
+    
+    useEffect(()=>{
+        console.log(getUser())
+    },[])
+
+    const getUser = () =>{
+         let user = getActualUser(userId)
+        user.then(users => {
+            setEmail(users.data()["email"])
+            setName(users.data()["name"])
+            setPhoneNumber(users.data()["phoneNumber"])
+        }).catch(err => console.log(err))
+    }
+    
+
     const logOut = () =>{
         auth.signOut()
         .then(()=>{
@@ -29,14 +51,14 @@ export function Profile() {
             </View>
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
-                <TextInput style={styles.input} placeholder="Maria Jose Gonzalez Vasquez"/>
+                <TextInput style={styles.input} placeholder="Nombre" value={name} onChangeText={setName}/>
                 <Text>Email:</Text>
-                <TextInput style={styles.input} placeholder="ejemplo@outlook.com"/>
+                <TextInput style={styles.input} placeholder="ejemplo@outlook.com" value={email} onChangeText={setEmail}/>
                 <Text>Numer de telefono:</Text>
-                <TextInput style={styles.input} />
+                <TextInput style={styles.input}  value={phoneNumber} onChangeText={setPhoneNumber}/>
             </View>
             <View style={styles.account}>
-                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Toma una ruta")}>
+                <TouchableOpacity style={styles.button} onPress={getUser}>
                     <Text style={styles.buttonText}>Guardar</Text>
                     </TouchableOpacity>
 
