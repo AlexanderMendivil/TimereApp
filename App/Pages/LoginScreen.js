@@ -4,12 +4,18 @@ import { StatusBar } from 'expo-status-bar';
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
 import { logIn } from '../controler/loginController';
+import {useDispatch} from "react-redux"
+import {getUser} from '../actions/user_actions'
 
 export function LoginScreen() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    
     const navigation = useNavigation()
+    const dispatch = useDispatch()
+    const getUserId = (userId) => dispatch(getUser(userId))
+
     useEffect(()=>{
         const unsubscribe = auth.onAuthStateChanged(user=>{
           if(user){
@@ -22,7 +28,9 @@ export function LoginScreen() {
     
     const handleLogIn = () =>{
         let login = logIn(email, password)
-        login .then(credentials => console.log(credentials.user.uid))
+        login.then(credentials => {
+            getUserId(credentials.user.uid)
+        })
         .catch(err=>err.message)
     }
     return (
@@ -51,7 +59,7 @@ export function LoginScreen() {
 const styles = StyleSheet.create({
     container:{
         flex: 1,
-        justifyContent:'center',
+        // justifyContent:'center',
         alignItems:'center'
     },
     logoContainer:{
