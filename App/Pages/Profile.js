@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions} from "react-native"
-import { StatusBar } from 'expo-status-bar';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
-import { auth } from '../model/firebase';
+import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/core';
+
+import { auth } from '../model/firebase';
 import { useSelector } from 'react-redux';
-import {getActualUser} from "../controler/profileController"
+import {getActualUser, updateUser } from "../controler/profileController"
+import { User } from '../model/user';
+
 import * as ImagePicker from "expo-image-picker"
 
 export function Profile() {
@@ -18,6 +21,10 @@ export function Profile() {
     const navigation = useNavigation()
     const userId = useSelector(state => state.userRedux.userId)
     
+    useEffect(()=>{
+        getUser()
+    },[])
+
     const openImagePicker = async () =>{
         let permissionResult = await ImagePicker.requestCameraPermissionsAsync()
 
@@ -34,9 +41,6 @@ export function Profile() {
 
         setImage({localUri: pickerResult.uri})
     }    
-    useEffect(()=>{
-        console.log(getUser())
-    },[])
 
     const getUser = () =>{
          let user = getActualUser(userId)
@@ -47,7 +51,11 @@ export function Profile() {
         }).catch(err => console.log(err))
     }
      
-
+    const updateCurrentUser = () =>{
+        const myUser = new User(email,userId,name,phoneNumber)
+        let updatedUser = updateUser(userId, JSON.parse(JSON.stringify(myUser)), email)
+        updatedUser.then(()=>{alert("Perfil actualizado!")}).catch(err=>console.log(err))
+    }
     const logOut = () =>{
         auth.signOut()
         .then(()=>{
@@ -70,14 +78,14 @@ export function Profile() {
             </View>
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
-                <TextInput style={styles.input} placeholder="Nombre" value={name} onChangeText={setName}/>
+                <TextInput style={styles.input} placeholder="Nombre" value={name} onChangeText={(text)=>setName(text)}/>
                 <Text>Email:</Text>
-                <TextInput style={styles.input} placeholder="ejemplo@outlook.com" value={email} onChangeText={setEmail}/>
+                <TextInput style={styles.input} placeholder="ejemplo@outlook.com" value={email} onChangeText={(text)=>setEmail(text)}/>
                 <Text>Numero de telefono:</Text>
-                <TextInput style={styles.input}  value={phoneNumber} onChangeText={setPhoneNumber}/>
+                <TextInput style={styles.input}  value={phoneNumber} onChangeText={(text)=>setPhoneNumber(text)}/>
             </View>
             <View style={styles.account}>
-                <TouchableOpacity style={styles.button} onPress={getUser}>
+                <TouchableOpacity style={styles.button} onPress={updateCurrentUser}>
                     <Text style={styles.buttonText}>Guardar</Text>
                     </TouchableOpacity>
 
