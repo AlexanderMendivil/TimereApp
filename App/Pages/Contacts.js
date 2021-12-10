@@ -1,9 +1,31 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions} from "react-native"
 import { StatusBar } from 'expo-status-bar';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+
+import { useSelector } from 'react-redux';
+
+import { getContacts } from '../controler/contactController';
+
 export function Contacts({navigation}) {
 
+    const [arrayContacts, setArrayContacts] = useState([{}])
+    const userId = useSelector(state => state.userRedux.userId)
+    
+    useEffect(()=>{
+        getActualContacts()
+        console.log(arrayContacts)
+    },[])
+
+    const getActualContacts = () =>{
+        let contacts = getContacts(userId)
+        contacts.then(contact => {
+            contact.forEach((doc)=>{
+                setArrayContacts(...doc.data()["contacs"])
+            })
+        }).catch(err=>console.log(err))
+
+    }
 
     return (
         <View style={styles.container}>
