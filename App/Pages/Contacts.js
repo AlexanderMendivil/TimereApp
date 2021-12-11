@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions} from "react-native"
+import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions, FlatList} from "react-native"
+import {ListItem} from "react-native-elements"
 import { StatusBar } from 'expo-status-bar';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 
@@ -14,14 +15,15 @@ export function Contacts({navigation}) {
     
     useEffect(()=>{
         getActualContacts()
-        console.log(arrayContacts)
     },[])
-
+    
     const getActualContacts = () =>{
         let contacts = getContacts(userId)
-        contacts.then(contact => {
+        contacts.then(contact => {  
             contact.forEach((doc)=>{
-                setArrayContacts(...doc.data()["contacs"])
+                // console.log(doc.data()["contacs"])
+                setArrayContacts(...arrayContacts, doc.data()["contacs"])
+                console.log(arrayContacts)
             })
         }).catch(err=>console.log(err))
 
@@ -30,22 +32,27 @@ export function Contacts({navigation}) {
     return (
         <View style={styles.container}>
             <Text style={styles.subtext}>Aquí puedes ver tus contactos de confianza.</Text>    
-            <View style={styles.contactContainer}>   
+            {/* <FlatList 
+            data={arrayContacts} 
+            keyExtractor={ (item, index)=> item.nombre }
+            renderItem={(data)=><ListItem title={data.item.name} bottomDivider/>
+            }/> */}
+            {/* <View style={styles.contactContainer}>   
                 <FontAwesome5 name="trash" color="#FF3131" size={20} iconStyle={{marginRight: 20}}/>
                 <View style={styles.information}>
                     <Text style={styles.subtext}>Joseph Antuan Mendez Gallego</Text>    
                     <Text style={styles.subtext}>+52 6623546754</Text>    
                 </View>
                 <Image style={styles.contacto} source={require('../assets/contacto1.jpeg')}/>
-            </View>
-            <View style={styles.contactContainer}>   
+            </View> */}
+            {/* <View style={styles.contactContainer}>   
                 <FontAwesome5 name="trash" color="#FF3131" size={20} iconStyle={{marginRight: 20}}/>
                 <View style={styles.information}>
                     <Text style={styles.subtext}>Alexandra Galil </Text>    
                     <Text style={styles.subtext}>+52 6623456814</Text>    
                 </View>
                 <Image style={styles.contacto} source={require('../assets/contacto2.jpg')}/>
-            </View>
+            </View> */}
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
                 <TextInput style={styles.input} placeholder="Maria Jose Gonzalez Vasquez"/>
