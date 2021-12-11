@@ -31,7 +31,7 @@ export function LoginScreen() {
         login.then(credentials => {
             getUserId(credentials.user.uid)
         })
-        .catch(err=>err.message)
+        .catch(err=>alert(err.message))
     }
     return (
         <View style={styles.container}>
