@@ -1,6 +1,7 @@
 
 // TYPES FOR USER
 export const GET_USER = "GET_USER"
+export const USE_USER = "USE_USER"
 
 // TYPES FOR CONTACTS
 export const GET_CONTACTS = "GET_CONTACTS"
