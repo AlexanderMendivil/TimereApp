@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-native"
+import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Alert} from "react-native"
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
 import { logIn } from '../controler/loginController';
 import {useDispatch} from "react-redux"
-import {getUser} from '../actions/user_actions'
+import {getUser, useUser} from '../actions/user_actions'
+import { getActualUser } from '../controler/profileController';
 
 export function LoginScreen() {
 
@@ -14,7 +15,9 @@ export function LoginScreen() {
     
     const navigation = useNavigation()
     const dispatch = useDispatch()
+    const secondDispatch = useDispatch()
     const getUserId = (userId) => dispatch(getUser(userId))
+    const getCompleteUser = (user) => secondDispatch(useUser(user))
 
     useEffect(()=>{
         const unsubscribe = auth.onAuthStateChanged(user=>{
@@ -30,8 +33,10 @@ export function LoginScreen() {
         let login = logIn(email, password)
         login.then(credentials => {
             getUserId(credentials.user.uid)
+            let user = getActualUser(credentials.user.uid)
+            user.then(user => getCompleteUser(user.data()))
         })
-        .catch(err=>alert(err.message))
+        .catch(()=>Alert.alert("¡Cuidado!","Usuario o contraseña incorrectos"))
     }
     return (
         <View style={styles.container}>
@@ -43,7 +48,7 @@ export function LoginScreen() {
         </View>
         <View style={styles.formContaier}>
             <Text>Email:</Text>
-            <TextInput style={styles.input} placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
+            <TextInput style={styles.input} keyboardType='email-address' autoComplete='email' placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
             <Text>Contraseña:</Text>
             <TextInput style={styles.input} secureTextEntry placeholder="minimo 6 caracteres" onChangeText={(text)=>setPassword(text)}></TextInput>
         </View>
