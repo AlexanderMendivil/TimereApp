@@ -3,6 +3,7 @@ import {View, Text, Image, StyleSheet, Dimensions, TextInput,TouchableOpacity, S
 import {StatusBar} from "expo-status-bar"
 import MapView, {PROVIDER_GOOGLE, Marker, Polyline, Polygon} from "react-native-maps"
 // import MapViewDirections from 'react-native-maps-directions';
+import { useSelector } from 'react-redux';
 
 import * as Location from "expo-location"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
@@ -14,6 +15,9 @@ export function Home({navigation}) {
       latitude:0,
       longitude:0}
   });
+
+  const completeUser = useSelector(state => state.userRedux.user)
+
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
@@ -25,13 +29,14 @@ export function Home({navigation}) {
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
     })();
+    // console.log(completeUser)
   }, []);
   
   return (
     <View style={styles.container}>
       <View style={styles.user}>
         <View style={styles.container}>
-        <Text style={styles.texto}>Bienvenida, Maria</Text>
+        <Text style={styles.texto}>Bienvenida, {completeUser.name}</Text>
         </View>
         <View style={styles.container}>
         <Image style={styles.image} source={require('../assets/foto_perfil.jpeg')}></Image>
