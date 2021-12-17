@@ -5,9 +5,10 @@ import { StatusBar } from 'expo-status-bar';
 import { useNavigation } from '@react-navigation/core';
 
 import { auth } from '../model/firebase';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {getActualUser, updateUser } from "../controler/profileController"
 import { User } from '../model/user';
+import {useUser} from '../actions/user_actions'
 
 import * as ImagePicker from "expo-image-picker"
 
@@ -20,7 +21,10 @@ export function Profile() {
 
     const navigation = useNavigation()
     const userId = useSelector(state => state.userRedux.userId)
-    
+    const user = useSelector(state => state.userRedux.user)
+    const dispatch = useDispatch()
+    const upUser = (user) => dispatch(useUser(user))
+
     useEffect(()=>{
         getUser()
     },[])
@@ -43,18 +47,23 @@ export function Profile() {
     }    
 
     const getUser = () =>{
-         let user = getActualUser(userId)
-        user.then(users => {
-            setEmail(users.data()["email"])
-            setName(users.data()["name"])
-            setPhoneNumber(users.data()["phoneNumber"])
-        }).catch(err => console.log(err))
+        //  let user = getActualUser(userId)
+
+         setEmail(user.email)
+         setName(user.name)
+         setPhoneNumber(user.phoneNumber)
+        // user.then(users => {
+        //     setEmail(users.data()["email"])
+        //     setName(users.data()["name"])
+        //     setPhoneNumber(users.data()["phoneNumber"])
+        // }).catch(err => console.log(err))
     }
      
     const updateCurrentUser = () =>{
         const myUser = new User(email,userId,name,phoneNumber)
         let updatedUser = updateUser(userId, JSON.parse(JSON.stringify(myUser)), email)
         updatedUser.then(()=>{alert("Perfil actualizado!")}).catch(err=>console.log(err))
+        upUser(JSON.parse(JSON.stringify(myUser)))
     }
     const logOut = () =>{
         auth.signOut()
@@ -78,9 +87,9 @@ export function Profile() {
             </View>
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
-                <TextInput style={styles.input} placeholder="Nombre" value={name} onChangeText={(text)=>setName(text)}/>
+                <TextInput style={styles.input} maxLength={30} placeholder="Nombre" value={name} onChangeText={(text)=>setName(text)}/>
                 <Text>Email:</Text>
-                <TextInput style={styles.input} placeholder="ejemplo@outlook.com" value={email} onChangeText={(text)=>setEmail(text)}/>
+                <TextInput style={styles.input} autoComplete='email' keyboardType='email-address' placeholder="ejemplo@outlook.com" value={email} onChangeText={(text)=>setEmail(text)}/>
                 <Text>Numero de telefono:</Text>
                 <TextInput style={styles.input}  value={phoneNumber} onChangeText={(text)=>setPhoneNumber(text)}/>
             </View>
