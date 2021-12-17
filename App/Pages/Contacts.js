@@ -15,15 +15,16 @@ export function Contacts({navigation}) {
     
     useEffect(()=>{
         getActualContacts()
+        // console.log(arrayContacts)
     },[])
     
     const getActualContacts = () =>{
         let contacts = getContacts(userId)
-        contacts.then(contact => {  
+        contacts.then(contact => { 
+            // console.log(contact) 
             contact.forEach((doc)=>{
-                // console.log(doc.data()["contacs"])
-                setArrayContacts(...arrayContacts, doc.data()["contacs"])
-                console.log(arrayContacts)
+                console.log(doc.data()["contact"]) 
+                setArrayContacts(...arrayContacts, doc.data()["contact"])
             })
         }).catch(err=>console.log(err))
 
