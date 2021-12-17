@@ -1,12 +1,13 @@
 import React, {useState} from 'react';
-import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity} from "react-native"
+import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Alert} from "react-native"
 import { StatusBar } from 'expo-status-bar';
-import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
 import { createUser, SignUp } from '../controler/registerController';
 import { User } from '../model/user';
 import {useDispatch} from "react-redux"
 import {getUser} from '../actions/user_actions'
+import { createContacts } from '../controler/contactController';
+import { Contacts } from '../model/contacts';
 
 
 export function RegisterScreen() {
@@ -23,17 +24,24 @@ export function RegisterScreen() {
 
         let register = SignUp (email, password)
         register.then(credentials =>{
+            
             getUserId(credentials.user.uid)
             const myUser = new User(email,credentials.user.uid,name,"")
             const myUserObject = JSON.parse(JSON.stringify(myUser))
-            
             createUser(credentials.user.uid, myUserObject )
+
+            const myContacts = new Contacts(credentials.user.uid, [{}])
+            createContacts(JSON.parse(JSON.stringify(myContacts))).then().catch(err=>console.log(err))
             .then(()=>console.log("usuario registrado"))
             .catch(e => console.log(e.message))
-
+            
             navigation.navigate("login")
         })
-        .catch(err => alert(err.message))
+        .catch((e) =>
+        console.log(e.message)
+        //  Alert.alert("¡Cuidado!","Algún campo es incorrecto o está vacio.")
+        )
+    
     }
     return (
         <View style={styles.container}>
@@ -45,9 +53,9 @@ export function RegisterScreen() {
         </View>
         <View style={styles.formContaier}>
             <Text>Email:</Text>
-            <TextInput style={styles.input} placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
+            <TextInput style={styles.input} autoComplete='email' keyboardType='email-address' placeholder="ejemplo@outlook.com" onChangeText={(text)=>setEmail(text)}></TextInput>
             <Text>Nombre:</Text>
-            <TextInput style={styles.input} onChangeText={(text)=>setName(text)} placeholder="Nombre"></TextInput>
+            <TextInput style={styles.input} maxLength={30} onChangeText={(text)=>setName(text)} placeholder="Nombre"></TextInput>
             <Text>Contraseña:</Text>
             <TextInput style={styles.input} secureTextEntry placeholder="minimo 6 caracteres" onChangeText={(text)=>setPassword(text)}></TextInput>
         </View>
