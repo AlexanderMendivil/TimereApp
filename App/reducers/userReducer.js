@@ -1,7 +1,9 @@
 import { GET_USER } from "../actions/types";
+import { USE_USER } from "../actions/types";
 
 const initialState = {
-    userId: ""
+    userId: "",
+    user: {}
 }
 
 const userReducer = (state = initialState, action) => {
@@ -10,6 +12,10 @@ const userReducer = (state = initialState, action) => {
         case GET_USER:
             return {...state, 
             userId: action.data
+        }
+        case USE_USER:
+            return {...state, 
+            user: action.data
         }
         
         default:
