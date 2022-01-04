@@ -6,29 +6,37 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 
 import { useSelector } from 'react-redux';
 
-import { getContacts } from '../controler/contactController';
+import { getContacts, uploadContact } from '../controler/contactController';
 
 export function Contacts({navigation}) {
 
     const [arrayContacts, setArrayContacts] = useState([{}])
+    const [contactName, setcontactName] = useState("")
+    const [contactNumber, setcontactNumber] = useState("")
+
     const userId = useSelector(state => state.userRedux.userId)
     
     useEffect(()=>{
         getActualContacts()
-        // console.log(arrayContacts)
     },[])
     
+    const addContact = () => {
+        const contacts = uploadContact(userId, )
+    } 
+
     const getActualContacts = () =>{
         let contacts = getContacts(userId)
         contacts.then(contact => { 
             // console.log(contact) 
             contact.forEach((doc)=>{
                 console.log(doc.data()["contact"]) 
-                setArrayContacts(...arrayContacts, doc.data()["contact"])
+                setArrayContacts(doc.data()["contact"])
             })
+            
         }).catch(err=>console.log(err))
-
+        
     }
+    
 
     return (
         <View style={styles.container}>
@@ -56,10 +64,10 @@ export function Contacts({navigation}) {
             </View> */}
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
-                <TextInput style={styles.input} placeholder="Maria Jose Gonzalez Vasquez"/>
+                <TextInput style={styles.input} onChangeText={(text)=>setcontactNumber(text)} placeholder="Maria Jose Gonzalez Vasquez"/>
                 <Text>Numero:</Text>
-                <TextInput style={styles.input} placeholder="+52 6624657587"/>
-                <TouchableOpacity style={styles.button} onPress={()=>navigation.navigate("Toma una ruta")}><Text style={styles.buttonText}>Agregar</Text></TouchableOpacity>
+                <TextInput style={styles.input} onChangeText={(text)=>setcontactName(text)} placeholder="+52 6624657587"/>
+                <TouchableOpacity style={styles.button} onPress={()=>console.log("")}><Text style={styles.buttonText}>Agregar</Text></TouchableOpacity>
                 
             </View>
             {/* <View style={styles.account}>
