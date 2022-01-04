@@ -2,11 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, Image, StyleSheet, Dimensions, TextInput,TouchableOpacity, ScrollView} from "react-native"
 import {StatusBar} from "expo-status-bar"
 import MapView, {PROVIDER_GOOGLE, Marker, Polyline, Polygon} from "react-native-maps"
-// import MapViewDirections from 'react-native-maps-directions';
+import MapViewDirections from 'react-native-maps-directions';
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete"
+
 import { useSelector } from 'react-redux';
 
 import * as Location from "expo-location"
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
+import {GOOGLE_MAPS_APIKEY} from "@env"
 
 export function Home({navigation}) {
   const [errorMsg, setErrorMsg] = useState(null);
@@ -15,7 +18,8 @@ export function Home({navigation}) {
       latitude:0,
       longitude:0}
   });
-
+  const [origin, setOrigin] = useState(null)
+  const [destination, setDestination] = useState(null)
   const completeUser = useSelector(state => state.userRedux.user)
 
   useEffect(() => {
@@ -27,6 +31,7 @@ export function Home({navigation}) {
       }
 
       let location = await Location.getCurrentPositionAsync({});
+      console.log(location)
       setLocation(location);
     })();
     // console.log(completeUser)
@@ -51,24 +56,81 @@ export function Home({navigation}) {
          longitudeDelta:0.002,
          }
          }
-         >
-            <Polygon
-            coordinates={[
-              {latitude:location.coords.latitude,longitude:location.coords.longitude},
-              {latitude:29.1183243,longitude:-110.9987351}]
-            }
-            lineCap='square'
-            />
+         > 
             <Marker coordinate={{latitude:location.coords.latitude,longitude:location.coords.longitude}} title="Mi locación"/>
+
+            {destination?.location && (
+                <Marker 
+                  coordinate={{
+                      latitude: destination.location.lat,
+                      longitude: destination.location.lng,}}
+                  title='destination'
+                  description={destination.description}
+                  identifier='destination'
+                />
+            )
+        }
+        {location && destination && (
+          <MapViewDirections
+            origin={origin}
+            destination = {destination.description}
+            apikey={GOOGLE_MAPS_APIKEY}
+            lineDashPattern={[0]}
+            strokeWidth={3}
+            strokeColor='black'
+          />
+      )}
           </MapView>
-      <View style={styles.destino}>
-        <Text style={styles.textD}>Marca el punto de destino:</Text>
-        <TextInput style={styles.input} placeholder="Punto destino"/>
+
+        <GooglePlacesAutocomplete 
+             placeholder="Punto de destino"
+            styles={
+                {
+                container:{
+                  flex:0,
+                  borderColor:'#DBDBDB',
+                  width:300,
+                  marginTop:12,
+                  marginBottom:12,
+                  borderWidth:1,
+                  borderRadius: 5,
+            },
+            textInput:{
+                fontSize:14
+            }
+          }
+        }
+            onPress={(data, details = null )=> {
+              setDestination({
+                location: details.geometry.location,
+                description: data.description
+              })
+              setOrigin({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+              })
+
+              // dispatch(
+              //     setOrigin({
+              //       location: details.geometry.location,
+              //   })
+              // )
+              // dispatch(setDestination(null))
+            }}
+            fetchDetails={true}
+            enablePoweredByContainer={false}
+             minLength={2}
+             query={{
+                 key: GOOGLE_MAPS_APIKEY,
+                 language: 'en'
+                }}
+                nearbyPlacesAPI="GooglePlacesSearch"
+                 debounce={400}
+                />
         <TouchableOpacity style={styles.button}>
         <Text style={styles.buttonText}>Empezar</Text>
         </TouchableOpacity>
-        {/* <Text style={styles.textD}>{location_}</Text> */}
-      </View>
+    
       <View style={styles.menu}>
         <FontAwesome5 size={20} name="user" style={styles.icon} onPress={()=> navigation.navigate("Perfil")}/>
         <FontAwesome5 size={20} name="home" style={styles.icon} onPress={()=> navigation.navigate("Toma una ruta")}/>
@@ -103,25 +165,7 @@ const styles = StyleSheet.create({
       height:60,
       borderRadius:99
     },
-    destino:{
-      flex:1,
-      marginTop:20,
-      justifyContent: 'center',
-      alignItems:'flex-start'
-    },
-    input:{
-      borderColor:'#DBDBDB',
-      width:300,
-      height:40,
-      marginTop:12,
-      marginBottom:12,
-      borderWidth:1,
-      borderRadius: 5,
-    },
-    textD:{
-      color:'#787272',
-      
-    },
+    
     button:{
       backgroundColor:'#FF3131',
       height: 40,
