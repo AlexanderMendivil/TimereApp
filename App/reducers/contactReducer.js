@@ -1,9 +1,9 @@
-import { GET_CONTACTS } from "../actions/types";
-import { DELETE_CONTACT } from "../actions/types";
+import { GET_CONTACTS, DELETE_CONTACT, GET_CONTACTS_PHONE_NUMBERS, DELETE_CONTACTS_PHONE_NUMBERS } from "../actions/types";
 import { v4 as uuidv4 } from "uuid"
 
 const initialState = {
-    contactsList: []
+    contactsList: [],
+    contactsPhone: null,
 }
 
 const contactReducer = (state = initialState, action) => {
@@ -23,6 +23,18 @@ const contactReducer = (state = initialState, action) => {
                 contactList: state.contactsList.filter((item) =>
                   item.key !== action.key)
               };
+
+        case GET_CONTACTS_PHONE_NUMBERS:
+            return{...state, 
+                    contactsPhone: action.data 
+            };
+
+        case DELETE_CONTACTS_PHONE_NUMBERS:
+            return{...state.contactsPhone, 
+                    contactsPhone: state.contactsPhone.filter((item)=>
+                    item.key != key
+                )
+            }
         default:
             return state
     }
