@@ -7,7 +7,8 @@ import { logIn } from '../controler/loginController';
 import {useDispatch} from "react-redux"
 import {getUser, useUser} from '../actions/user_actions'
 import { getActualUser } from '../controler/profileController';
-
+import { getContacts } from '../controler/contactController';
+import { getContactsPhoneNumbers } from '../actions/contacts_actions';
 export function LoginScreen() {
 
     const [email, setEmail] = useState("")
@@ -16,6 +17,9 @@ export function LoginScreen() {
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const secondDispatch = useDispatch()
+    const thirdDispatch = useDispatch()
+
+    const getPhoneNumbersContacts = (phoneNumber) => dispatch(getContactsPhoneNumbers(phoneNumber))
     const getUserId = (userId) => dispatch(getUser(userId))
     const getCompleteUser = (user) => secondDispatch(useUser(user))
 
@@ -33,8 +37,18 @@ export function LoginScreen() {
         let login = logIn(email, password)
         login.then(credentials => {
             getUserId(credentials.user.uid)
+            
             let user = getActualUser(credentials.user.uid)
             user.then(user => getCompleteUser(user.data()))
+
+            let contacts = getContacts(credentials.user.uid)
+            contacts.then(contact => { 
+            contact.forEach((doc)=>{
+                getPhoneNumbersContacts(doc.data()["contact"])
+            })
+            
+        }).catch(err=>console.log(err))
+
         })
         .catch(()=>Alert.alert("¡Cuidado!","Usuario o contraseña incorrectos"))
     }
