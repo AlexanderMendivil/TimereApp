@@ -8,11 +8,12 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { useSelector } from 'react-redux';
 
 import * as Location from "expo-location"
+import * as SMS from 'expo-sms';
+
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import {GOOGLE_MAPS_APIKEY} from "@env"
 
 export function Home({navigation}) {
-  const [errorMsg, setErrorMsg] = useState(null);
   const [location, setLocation] = useState({
     coords:{
       latitude:0,
@@ -24,19 +25,32 @@ export function Home({navigation}) {
 
   useEffect(() => {
     (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setErrorMsg('Permission to access location was denied');
-        return;
-      }
-
-      let location = await Location.getCurrentPositionAsync({});
-      console.log(location)
-      setLocation(location);
-    })();
-    // console.log(completeUser)
-  }, []);
+      try {
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+          return;
+        }
   
+        let location = await Location.getCurrentPositionAsync({});
+        setLocation(location);
+      } catch (error) {
+        console.log(error)        
+      }
+    })();
+
+  }, []);
+
+  const smsService = async () => {
+    const isAvailable = await SMS.isAvailableAsync();
+    if (isAvailable) {
+      const { result } = await SMS.sendSMSAsync(
+        ['0123456789', '9876543210'],
+        `Hola, soy ${completeUser.name}, necesito ayuda. Mensje enviado por TimereApp`
+      );
+    } else {
+      alert("No tiene servicios de SMS, no podrá avisar a sus contactos.")
+    }
+  }
   return (
     <View style={styles.container}>
       <View style={styles.user}>
@@ -109,13 +123,6 @@ export function Home({navigation}) {
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude
               })
-
-              // dispatch(
-              //     setOrigin({
-              //       location: details.geometry.location,
-              //   })
-              // )
-              // dispatch(setDestination(null))
             }}
             fetchDetails={true}
             enablePoweredByContainer={false}
@@ -127,8 +134,8 @@ export function Home({navigation}) {
                 nearbyPlacesAPI="GooglePlacesSearch"
                  debounce={400}
                 />
-        <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Empezar</Text>
+        <TouchableOpacity style={styles.button} onPress={()=>smsService()}>
+        <Text style={styles.buttonText}>AYUDA</Text>
         </TouchableOpacity>
     
       <View style={styles.menu}>
