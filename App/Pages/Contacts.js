@@ -1,78 +1,80 @@
 import React, {useEffect, useState} from 'react';
 import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Dimensions, FlatList} from "react-native"
-import {ListItem} from "react-native-elements"
 import { StatusBar } from 'expo-status-bar';
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { getContacts, uploadContact } from '../controler/contactController';
+import { uploadContact } from '../controler/contactController';
+import { deleteContactsPhoneNumbers } from '../actions/contacts_actions';
 
 export function Contacts({navigation}) {
 
-    const [arrayContacts, setArrayContacts] = useState([{}])
     const [contactName, setcontactName] = useState("")
     const [contactNumber, setcontactNumber] = useState("")
+    const [contactsNumber, setContacts] = useState([])
+
+    const dispatch = useDispatch()
+    const deleteCurrentPhoneNumber = (key) => dispatch(deleteContactsPhoneNumbers(key)) 
 
     const userId = useSelector(state => state.userRedux.userId)
+    const phoneNumbers = useSelector(state => state.contactRedux.contactsPhone)
+    // setContacts(phoneNumbers)
     
     useEffect(()=>{
-        getActualContacts()
+        console.log(phoneNumbers)
+        setContacts(phoneNumbers)
     },[])
+
     
     const addContact = () => {
-        const contacts = uploadContact(userId, )
+        const contacts = uploadContact(userId)
     } 
-
-    const getActualContacts = () =>{
-        let contacts = getContacts(userId)
-        contacts.then(contact => { 
-            // console.log(contact) 
-            contact.forEach((doc)=>{
-                console.log(doc.data()["contact"]) 
-                setArrayContacts(doc.data()["contact"])
-            })
-            
-        }).catch(err=>console.log(err))
+    const deleteContact = (key) => {
         
-    }
-    
+        let data = JSON.parse(JSON.stringify(phoneNumbers))
+        let phone = data.filter((contact) => contact.key !== key)
+        setContacts(phone)
 
-    return (
-        <View style={styles.container}>
-            <Text style={styles.subtext}>Aquí puedes ver tus contactos de confianza.</Text>    
-            {/* <FlatList 
-            data={arrayContacts} 
-            keyExtractor={ (item, index)=> item.nombre }
-            renderItem={(data)=><ListItem title={data.item.name} bottomDivider/>
-            }/> */}
-            {/* <View style={styles.contactContainer}>   
+    }
+
+    return (  
+        <View 
+        style={styles.container}>
+            <Text style={styles.subtext}>Aquí puedes ver tus contactos de confianza.</Text>
+            {
+                Object.keys(phoneNumbers[0]).length !== 0 &&(
+
+                    <FlatList 
+                    data={contactsNumber} 
+                    renderItem={({item})=>(
+                        <View style={styles.contactContainer}>
+                <TouchableOpacity onPress={()=>deleteContact(item.key)}>
                 <FontAwesome5 name="trash" color="#FF3131" size={20} iconStyle={{marginRight: 20}}/>
+                </TouchableOpacity>
                 <View style={styles.information}>
-                    <Text style={styles.subtext}>Joseph Antuan Mendez Gallego</Text>    
-                    <Text style={styles.subtext}>+52 6623546754</Text>    
+                    <Text style={styles.subtext}>{item.name}</Text>    
+                    <Text style={styles.subtext}>{item.phoneNumber}</Text>    
                 </View>
-                <Image style={styles.contacto} source={require('../assets/contacto1.jpeg')}/>
-            </View> */}
-            {/* <View style={styles.contactContainer}>   
-                <FontAwesome5 name="trash" color="#FF3131" size={20} iconStyle={{marginRight: 20}}/>
-                <View style={styles.information}>
-                    <Text style={styles.subtext}>Alexandra Galil </Text>    
-                    <Text style={styles.subtext}>+52 6623456814</Text>    
-                </View>
-                <Image style={styles.contacto} source={require('../assets/contacto2.jpg')}/>
-            </View> */}
+            </View>
+            )
+        }
+        keyExtractor={(item, index) => item.key.toString()}
+        />
+        )
+    }
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
                 <TextInput style={styles.input} onChangeText={(text)=>setcontactNumber(text)} placeholder="Maria Jose Gonzalez Vasquez"/>
                 <Text>Numero:</Text>
                 <TextInput style={styles.input} onChangeText={(text)=>setcontactName(text)} placeholder="+52 6624657587"/>
+                <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={()=>console.log("")}><Text style={styles.buttonText}>Agregar</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={()=>console.log("")}><Text style={styles.buttonText}>Guardar</Text></TouchableOpacity>
+                </View>
                 
             </View>
-            {/* <View style={styles.account}>
-            </View> */}
-
+         
             <View style={styles.menu}>
                   <FontAwesome5 size={20} name="user" style={styles.icon} onPress={()=> navigation.navigate("Perfil")}/>
                   <FontAwesome5 size={20} name="home" style={styles.icon} onPress={()=> navigation.navigate("Toma una ruta")}/>
@@ -91,7 +93,7 @@ const styles = StyleSheet.create({
     },
     contactContainer:{
         flex:1,
-        width:'80%',
+        width:'100%',
         flexDirection:'row',
         alignItems: 'flex-end',
         // justifyContent:'center',
@@ -100,7 +102,7 @@ const styles = StyleSheet.create({
         borderBottomWidth:1
     },
     information:{
-        flex:1,
+        // flex:1,
         marginLeft:5,
     },
     contacto:{
@@ -141,14 +143,6 @@ const styles = StyleSheet.create({
     buttonText:{
         color: '#ffff',
     },
-    // account:{
-    //     justifyContent:'center',
-    //     alignItems: 'center',
-    //     // marginTop: -50
-    // },
-    // register:{
-    //     color:'#FF3131'
-    // },
     menu:{
         flex:1,
         width:Dimensions.get("window").width,
@@ -160,5 +154,14 @@ const styles = StyleSheet.create({
       },
       icon:{
         color: '#787272'
+      },
+      item: {
+        padding: 10,
+        fontSize: 18,
+        height: 44,
+      },
+      buttonContainer:{
+          flexDirection: 'row',
+          justifyContent: "space-evenly"
       }
 })
