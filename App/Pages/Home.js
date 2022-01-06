@@ -134,7 +134,7 @@ export function Home({navigation}) {
                 nearbyPlacesAPI="GooglePlacesSearch"
                  debounce={400}
                 />
-        <TouchableOpacity style={styles.button} onPress={()=>smsService()}>
+        <TouchableOpacity style={[styles.button, !destination? {backgroundColor:"#ff6d5c"}: {backgroundColor:'#FF3131'}]} disabled={!destination} onPress={()=>smsService()}>
         <Text style={styles.buttonText}>AYUDA</Text>
         </TouchableOpacity>
     
