@@ -6,36 +6,45 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import { useSelector, useDispatch } from 'react-redux';
 
 import { uploadContact } from '../controler/contactController';
-import { deleteContactsPhoneNumbers } from '../actions/contacts_actions';
+import { deleteContactsPhoneNumbers, getContactsPhoneNumbers } from '../actions/contacts_actions';
+import { v4 as uuidv4 } from "uuid"
+
 
 export function Contacts({navigation}) {
 
     const [contactName, setcontactName] = useState("")
-    const [contactNumber, setcontactNumber] = useState("")
+    const [contactNumberText, setcontactNumber] = useState("")
     const [contactsNumber, setContacts] = useState([])
 
     const dispatch = useDispatch()
+    const secondDispatch = useDispatch()
     const deleteCurrentPhoneNumber = (key) => dispatch(deleteContactsPhoneNumbers(key)) 
 
     const userId = useSelector(state => state.userRedux.userId)
     const phoneNumbers = useSelector(state => state.contactRedux.contactsPhone)
+    const contactsNumberNew = (phoneNumber) => secondDispatch(getContactsPhoneNumbers(phoneNumber))
     // setContacts(phoneNumbers)
     
     useEffect(()=>{
-        console.log(phoneNumbers)
         setContacts(phoneNumbers)
     },[])
 
     
     const addContact = () => {
-        const contacts = uploadContact(userId)
+        if(contactName !== "" && contactNumberText !== ""){
+            setContacts([...contactsNumber, {key:uuidv4(), name: contactName, phoneNumber: contactNumberText}])
+        }else{
+            alert("El nombre y numero de telefono no pueden ser vacios.")
+        }
+        contactsNumberNew(contactsNumber)
+        // const contacts = uploadContact(userId)
     } 
     const deleteContact = (key) => {
         
-        let data = JSON.parse(JSON.stringify(phoneNumbers))
+        let data = JSON.parse(JSON.stringify(contactsNumber))
         let phone = data.filter((contact) => contact.key !== key)
+        contactsNumberNew(phone)
         setContacts(phone)
-
     }
 
     return (  
@@ -45,7 +54,7 @@ export function Contacts({navigation}) {
             {
                 Object.keys(phoneNumbers[0]).length !== 0 &&(
 
-                    <FlatList 
+                    <FlatList style={{width:"80%", height: "20%"}}
                     data={contactsNumber} 
                     renderItem={({item})=>(
                         <View style={styles.contactContainer}>
@@ -69,7 +78,7 @@ export function Contacts({navigation}) {
                 <Text>Numero:</Text>
                 <TextInput style={styles.input} onChangeText={(text)=>setcontactName(text)} placeholder="+52 6624657587"/>
                 <View style={styles.buttonContainer}>
-                <TouchableOpacity style={styles.button} onPress={()=>console.log("")}><Text style={styles.buttonText}>Agregar</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.button} onPress={()=>addContact()}><Text style={styles.buttonText}>Agregar</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={()=>console.log("")}><Text style={styles.buttonText}>Guardar</Text></TouchableOpacity>
                 </View>
                 
@@ -96,7 +105,7 @@ const styles = StyleSheet.create({
         width:'100%',
         flexDirection:'row',
         alignItems: 'flex-end',
-        // justifyContent:'center',
+        justifyContent:"space-around",
         marginTop:10,
         borderBottomColor:'#787272',
         borderBottomWidth:1
@@ -144,7 +153,7 @@ const styles = StyleSheet.create({
         color: '#ffff',
     },
     menu:{
-        flex:1,
+        // flex:1,
         width:Dimensions.get("window").width,
         flexDirection:'row',
         justifyContent: 'space-around',
