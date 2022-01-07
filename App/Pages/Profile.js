@@ -47,23 +47,21 @@ export function Profile() {
     }    
 
     const getUser = () =>{
-        //  let user = getActualUser(userId)
-
          setEmail(user.email)
          setName(user.name)
          setPhoneNumber(user.phoneNumber)
-        // user.then(users => {
-        //     setEmail(users.data()["email"])
-        //     setName(users.data()["name"])
-        //     setPhoneNumber(users.data()["phoneNumber"])
-        // }).catch(err => console.log(err))
     }
      
     const updateCurrentUser = () =>{
-        const myUser = new User(email,userId,name,phoneNumber)
-        let updatedUser = updateUser(userId, JSON.parse(JSON.stringify(myUser)), email)
-        updatedUser.then(()=>{alert("Perfil actualizado!")}).catch(err=>console.log(err))
-        upUser(JSON.parse(JSON.stringify(myUser)))
+        if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)){
+            const myUser = new User(email,userId,name,phoneNumber)
+            let updatedUser = updateUser(userId, JSON.parse(JSON.stringify(myUser)), email)
+            updatedUser.then(()=>{alert("Perfil actualizado!")}).catch(err=>console.log(err))
+            upUser(JSON.parse(JSON.stringify(myUser)))
+        }else{
+            alert("Tú email es invalido.")
+
+        }
     }
     const logOut = () =>{
         auth.signOut()
