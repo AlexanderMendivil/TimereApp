@@ -6,7 +6,8 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5"
 import { useSelector, useDispatch } from 'react-redux';
 
 import { uploadContact } from '../controler/contactController';
-import { deleteContactsPhoneNumbers, getContactsPhoneNumbers } from '../actions/contacts_actions';
+import { ContactsModel } from '../model/contacts';
+import { getContactsPhoneNumbers } from '../actions/contacts_actions';
 import { v4 as uuidv4 } from "uuid"
 
 
@@ -16,12 +17,11 @@ export function Contacts({navigation}) {
     const [contactNumberText, setcontactNumber] = useState("")
     const [contactsNumber, setContacts] = useState([{}])
 
-    const dispatch = useDispatch()
     const secondDispatch = useDispatch()
-    const deleteCurrentPhoneNumber = (key) => dispatch(deleteContactsPhoneNumbers(key)) 
 
     const userId = useSelector(state => state.userRedux.userId)
     const phoneNumbers = useSelector(state => state.contactRedux.contactsPhone)
+    const idContact = useSelector(state => state.contactRedux.contactId)
     const contactsNumberNew = (phoneNumber) => secondDispatch(getContactsPhoneNumbers(phoneNumber))
     // setContacts(phoneNumbers)
     
@@ -29,12 +29,17 @@ export function Contacts({navigation}) {
         setContacts(phoneNumbers)
     },[])
 
-    
+    const submitContacts = (contacto) => {
+        const finalContact = new ContactsModel(userId, contacto)
+        const finalContactObject = JSON.parse(JSON.stringify(finalContact))
+
+        const upContact = uploadContact(idContact, finalContactObject)
+        upContact.then().catch(err=>console.log(err.message))
+    }
     const addContact = () => {
         let temporaryContacts
         if(contactName !== "" && contactNumberText !== "" && /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(contactNumberText)){
             temporaryContacts = [...contactsNumber, {key:uuidv4(), name: contactName, phoneNumber: contactNumberText}]
-            
         }else{
             alert("El nombre o número de telefono son invalidos.")
             return
@@ -42,11 +47,12 @@ export function Contacts({navigation}) {
         if(Object.keys(contactsNumber[0]).length === 0){
             temporaryContacts.shift()
             contactsNumberNew(temporaryContacts)
+            submitContacts(temporaryContacts)
             return
         }
         contactsNumberNew(temporaryContacts)
+        submitContacts(temporaryContacts)
         setContacts(temporaryContacts)
-        // const contacts = uploadContact(userId)
     } 
     const deleteContact = (key) => {
         
@@ -54,10 +60,12 @@ export function Contacts({navigation}) {
         let phone = data.filter((contact) => contact.key !== key)
         if(phone.length === 0){
             setContacts([{}])
-            contactsNumberNew(phone)
+            contactsNumberNew([{}])
+            submitContacts([{}])
             return
         }
         contactsNumberNew(phone)
+        submitContacts(phone)
         setContacts(phone)
     }
 
