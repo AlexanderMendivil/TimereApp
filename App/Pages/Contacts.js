@@ -14,7 +14,7 @@ export function Contacts({navigation}) {
 
     const [contactName, setcontactName] = useState("")
     const [contactNumberText, setcontactNumber] = useState("")
-    const [contactsNumber, setContacts] = useState([])
+    const [contactsNumber, setContacts] = useState([{}])
 
     const dispatch = useDispatch()
     const secondDispatch = useDispatch()
@@ -31,18 +31,32 @@ export function Contacts({navigation}) {
 
     
     const addContact = () => {
-        if(contactName !== "" && contactNumberText !== ""){
-            setContacts([...contactsNumber, {key:uuidv4(), name: contactName, phoneNumber: contactNumberText}])
+        let temporaryContacts
+        if(contactName !== "" && contactNumberText !== "" && /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(contactNumberText)){
+            temporaryContacts = [...contactsNumber, {key:uuidv4(), name: contactName, phoneNumber: contactNumberText}]
+            
         }else{
-            alert("El nombre y numero de telefono no pueden ser vacios.")
+            alert("El nombre o número de telefono son invalidos.")
+            return
         }
-        contactsNumberNew(contactsNumber)
+        if(Object.keys(contactsNumber[0]).length === 0){
+            temporaryContacts.shift()
+            contactsNumberNew(temporaryContacts)
+            return
+        }
+        contactsNumberNew(temporaryContacts)
+        setContacts(temporaryContacts)
         // const contacts = uploadContact(userId)
     } 
     const deleteContact = (key) => {
         
         let data = JSON.parse(JSON.stringify(contactsNumber))
         let phone = data.filter((contact) => contact.key !== key)
+        if(phone.length === 0){
+            setContacts([{}])
+            contactsNumberNew(phone)
+            return
+        }
         contactsNumberNew(phone)
         setContacts(phone)
     }
@@ -52,31 +66,33 @@ export function Contacts({navigation}) {
         style={styles.container}>
             <Text style={styles.subtext}>Aquí puedes ver tus contactos de confianza.</Text>
             {
-                Object.keys(phoneNumbers[0]).length !== 0 &&(
+                contactsNumber !== null && Object.keys(contactsNumber[0]).length !== 0 ?
 
-                    <FlatList style={{width:"80%", height: "20%"}}
+                <FlatList style={{width:"80%", height: "20%"}}
                     data={contactsNumber} 
                     renderItem={({item})=>(
                         <View style={styles.contactContainer}>
-                <TouchableOpacity onPress={()=>deleteContact(item.key)}>
-                <FontAwesome5 name="trash" color="#FF3131" size={20} iconStyle={{marginRight: 20}}/>
-                </TouchableOpacity>
-                <View style={styles.information}>
-                    <Text style={styles.subtext}>{item.name}</Text>    
-                    <Text style={styles.subtext}>{item.phoneNumber}</Text>    
-                </View>
-            </View>
-            )
-        }
-        keyExtractor={(item, index) => item.key.toString()}
-        />
-        )
+                            <TouchableOpacity onPress={()=>deleteContact(item.key)}>
+                            <FontAwesome5 name="trash" color="#FF3131" size={20} iconStyle={{marginRight: 20}}/>
+                            </TouchableOpacity>
+                            <View style={styles.information}>
+                                <Text style={styles.subtext}>{item.name}</Text>    
+                                <Text style={styles.subtext}>{item.phoneNumber}</Text>    
+                            </View>
+                        </View>
+                        )
+                    }
+                     keyExtractor={(item, index) =>item.key.toString()}
+                />
+        
+        : <Text>No hay contactos.</Text>
+
     }
             <View style={styles.formContaier}>
                 <Text>Nombre:</Text>
-                <TextInput style={styles.input} onChangeText={(text)=>setcontactNumber(text)} placeholder="Maria Jose Gonzalez Vasquez"/>
+                <TextInput style={styles.input} onChangeText={(text)=>setcontactName(text)} placeholder="Maria Jose Gonzalez Vasquez"/>
                 <Text>Numero:</Text>
-                <TextInput style={styles.input} onChangeText={(text)=>setcontactName(text)} placeholder="+52 6624657587"/>
+                <TextInput style={styles.input} onChangeText={(text)=>setcontactNumber(text)} placeholder="+52 6624657587"/>
                 <View style={styles.buttonContainer}>
                 <TouchableOpacity style={styles.button} onPress={()=>addContact()}><Text style={styles.buttonText}>Agregar</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.button} onPress={()=>console.log("")}><Text style={styles.buttonText}>Guardar</Text></TouchableOpacity>
