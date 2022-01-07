@@ -1,4 +1,4 @@
-export class Contacts{
+export class ContactsModel{
     
     constructor(id, contact){
         this.id = id,
