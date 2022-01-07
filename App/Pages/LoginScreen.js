@@ -6,13 +6,14 @@ import { useNavigation } from '@react-navigation/core';
 
 import {useDispatch} from "react-redux"
 
-import {getUser, useUser} from '../actions/user_actions'
+import {getUser, useUser, getUserImage} from '../actions/user_actions'
 import { getContactsId, getContactsPhoneNumbers } from '../actions/contacts_actions';
 
 import { getActualUser } from '../controler/profileController';
 import { getContacts } from '../controler/contactController';
 import { logIn } from '../controler/loginController';
 
+import { storageFirebase } from '../model/firebase';
 
 export function LoginScreen() {
 
@@ -23,11 +24,13 @@ export function LoginScreen() {
     const dispatch = useDispatch()
     const secondDispatch = useDispatch()
     const thirdDispatch = useDispatch()
+    const fourthDispatch = useDispatch()
 
     const getContactIdRedux = (contactId) => thirdDispatch(getContactsId(contactId))
     const getPhoneNumbersContacts = (phoneNumber) => dispatch(getContactsPhoneNumbers(phoneNumber))
     const getUserId = (userId) => dispatch(getUser(userId))
     const getCompleteUser = (user) => secondDispatch(useUser(user))
+    const getImageUser = (image) => fourthDispatch(getUserImage(image))
 
     useEffect(()=>{
         const unsubscribe = auth.onAuthStateChanged(user=>{
@@ -43,7 +46,13 @@ export function LoginScreen() {
         let login = logIn(email, password)
         login.then(credentials => {
             getUserId(credentials.user.uid)
-            
+
+            storageFirebase.ref().child(`/Users/${credentials.user.uid}.jpg`).getDownloadURL().then(url=>{
+                getImageUser(url)
+                
+                })
+                .catch(err=>getImageUser(null))
+
             let user = getActualUser(credentials.user.uid)
             user.then(user => getCompleteUser(user.data()))
 
