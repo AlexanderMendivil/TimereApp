@@ -1,9 +1,10 @@
 import { GET_USER } from "../actions/types";
-import { USE_USER } from "../actions/types";
+import { USE_USER, GET_USER_IMAGE } from "../actions/types";
 
 const initialState = {
     userId: "",
-    user: {}
+    user: {},
+    userImage: null
 }
 
 const userReducer = (state = initialState, action) => {
@@ -16,6 +17,10 @@ const userReducer = (state = initialState, action) => {
         case USE_USER:
             return {...state, 
             user: action.data
+        }
+        case GET_USER_IMAGE:
+            return {...state, 
+            userImage: action.data
         }
         
         default:
