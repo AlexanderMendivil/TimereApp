@@ -5,9 +5,9 @@ export const getContacts = async (id) => {
 }
 
 export const createContacts = async (contact) => {
-    await db.collection("Contacts").add(contact)
+   return await db.collection("Contacts").add(contact)
 }
 
 export const uploadContact = async (id, contact) => {
-    return await db.collection("Contacts").where("id", "==", id).update(contact)
+    await db.collection("Contacts").doc(id).set(contact)
 }
