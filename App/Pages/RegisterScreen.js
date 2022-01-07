@@ -8,8 +8,9 @@ import {useDispatch} from "react-redux"
 import {getUser, useUser} from '../actions/user_actions'
 import { createContacts } from '../controler/contactController';
 import { getActualUser } from '../controler/profileController';
-import { Contacts } from '../model/contacts';
+import { ContactsModel } from '../model/contacts';
 
+import { getContactsPhoneNumbers, getContactsId } from '../actions/contacts_actions';
 
 export function RegisterScreen() {
 
@@ -20,9 +21,13 @@ export function RegisterScreen() {
     const navigation = useNavigation()
     const dispatch = useDispatch()
     const secondDispatch = useDispatch()
+    const thirdDispatch = useDispatch()
+    const fourthDispatch = useDispatch()
+
     const getUserId = (userId) => dispatch(getUser(userId))
     const getCompleteUser = (user) => secondDispatch(useUser(user))
-
+    const getPhoneNumbersContacts = (phoneNumber) => thirdDispatch(getContactsPhoneNumbers(phoneNumber))
+    const getContactIdRedux = (contactId) => fourthDispatch(getContactsId(contactId))
     const createInstanceUser = (email, id, name, phoneNumber) =>{
         const myUser = new User(email, id, name, phoneNumber)
         return myUser
@@ -41,10 +46,16 @@ export function RegisterScreen() {
             let user = getActualUser(credentials.user.uid)
             user.then(user => getCompleteUser(user.data()))
 
-            const myContacts = new Contacts(credentials.user.uid, [{}])
-            createContacts(JSON.parse(JSON.stringify(myContacts))).then().catch(err=>console.log(err))
-            .then(()=>console.log("usuario registrado"))
-            .catch(e => console.log(e.message))
+            const myContacts = new ContactsModel(credentials.user.uid, [{}])
+            createContacts(JSON.parse(JSON.stringify(myContacts)))
+            .then((doc)=>{
+                getContactIdRedux(doc.id)
+            })
+            .catch(err=>console.log(err.message))
+            // .then(()=>{
+            //     console.log("usuario registrado")})
+            // .catch(e => console.log(e.message))
+            getPhoneNumbersContacts([{}])
             
             navigation.navigate("login")
         })
