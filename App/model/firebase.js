@@ -1,4 +1,5 @@
 import * as firebase from "firebase";
+import "firebase/storage"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -22,6 +23,6 @@ if(firebase.apps.length === 0){
 
 const auth = firebase.auth()
 const db = firebase.firestore()
-const ref = firebase.storage()
+const storageFirebase = firebase.storage()
 const state_changed = firebase.storage.TaskEvent.STATE_CHANGED
-export {auth, db, ref, state_changed};
+export {auth, db, storageFirebase, state_changed};
