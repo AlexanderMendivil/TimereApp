@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/core';
 import { createUser, SignUp } from '../controler/registerController';
 import { User } from '../model/user';
 import {useDispatch} from "react-redux"
-import {getUser, useUser} from '../actions/user_actions'
+import {getUser, useUser, getUserImage} from '../actions/user_actions'
 import { createContacts } from '../controler/contactController';
 import { getActualUser } from '../controler/profileController';
 import { ContactsModel } from '../model/contacts';
@@ -23,23 +23,25 @@ export function RegisterScreen() {
     const secondDispatch = useDispatch()
     const thirdDispatch = useDispatch()
     const fourthDispatch = useDispatch()
+    const fifthDispatch = useDispatch()
 
     const getUserId = (userId) => dispatch(getUser(userId))
     const getCompleteUser = (user) => secondDispatch(useUser(user))
     const getPhoneNumbersContacts = (phoneNumber) => thirdDispatch(getContactsPhoneNumbers(phoneNumber))
     const getContactIdRedux = (contactId) => fourthDispatch(getContactsId(contactId))
+    const getImageUser = (image) => fifthDispatch(getUserImage(image))
+
     const createInstanceUser = (email, id, name, phoneNumber) =>{
         const myUser = new User(email, id, name, phoneNumber)
         return myUser
 
     }
     const handleSignUp = () =>{
-
+        getImageUser(null)
         let register = SignUp (email, password)
         register.then(credentials =>{
             
             getUserId(credentials.user.uid)
-            // const myUser = new User(email,credentials.user.uid,name,"")
             const myUser = createInstanceUser(email,credentials.user.uid,name,"")
             const myUserObject = JSON.parse(JSON.stringify(myUser))
             createUser(credentials.user.uid, myUserObject )
@@ -52,16 +54,13 @@ export function RegisterScreen() {
                 getContactIdRedux(doc.id)
             })
             .catch(err=>console.log(err.message))
-            // .then(()=>{
-            //     console.log("usuario registrado")})
-            // .catch(e => console.log(e.message))
+            
             getPhoneNumbersContacts([{}])
             
             navigation.navigate("login")
         })
         .catch((e) =>
-        console.log(e.message)
-        //  Alert.alert("¡Cuidado!","Algún campo es incorrecto o está vacio.")
+         Alert.alert("¡Cuidado!","Algún campo es incorrecto o está vacio.")
         )
     
     }
