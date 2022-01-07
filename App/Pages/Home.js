@@ -21,7 +21,9 @@ export function Home({navigation}) {
   });
   const [origin, setOrigin] = useState(null)
   const [destination, setDestination] = useState(null)
+
   const completeUser = useSelector(state => state.userRedux.user)
+  const phoneNumbers = useSelector(state => state.contactRedux.contactsPhone)
 
   useEffect(() => {
     (async () => {
@@ -37,14 +39,20 @@ export function Home({navigation}) {
         console.log(error)        
       }
     })();
-
+    
   }, []);
 
   const smsService = async () => {
+    let tempArray = phoneNumbers
+    let arrayNumbers = []
+    for(let i= 0; i < tempArray.length; i++){
+      arrayNumbers.push(tempArray[i].phoneNumber)
+    }
+
     const isAvailable = await SMS.isAvailableAsync();
     if (isAvailable) {
       const { result } = await SMS.sendSMSAsync(
-        ['0123456789', '9876543210'],
+        arrayNumbers,
         `Hola, soy ${completeUser.name}, necesito ayuda. Mensje enviado por TimereApp`
       );
     } else {
