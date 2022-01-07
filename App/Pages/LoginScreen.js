@@ -3,12 +3,17 @@ import {View, StyleSheet, Image,Text, TextInput, TouchableOpacity, Alert} from "
 import { StatusBar } from 'expo-status-bar';
 import { auth } from '../model/firebase';
 import { useNavigation } from '@react-navigation/core';
-import { logIn } from '../controler/loginController';
+
 import {useDispatch} from "react-redux"
+
 import {getUser, useUser} from '../actions/user_actions'
+import { getContactsId, getContactsPhoneNumbers } from '../actions/contacts_actions';
+
 import { getActualUser } from '../controler/profileController';
 import { getContacts } from '../controler/contactController';
-import { getContactsPhoneNumbers } from '../actions/contacts_actions';
+import { logIn } from '../controler/loginController';
+
+
 export function LoginScreen() {
 
     const [email, setEmail] = useState("")
@@ -19,6 +24,7 @@ export function LoginScreen() {
     const secondDispatch = useDispatch()
     const thirdDispatch = useDispatch()
 
+    const getContactIdRedux = (contactId) => thirdDispatch(getContactsId(contactId))
     const getPhoneNumbersContacts = (phoneNumber) => dispatch(getContactsPhoneNumbers(phoneNumber))
     const getUserId = (userId) => dispatch(getUser(userId))
     const getCompleteUser = (user) => secondDispatch(useUser(user))
@@ -43,8 +49,9 @@ export function LoginScreen() {
 
             let contacts = getContacts(credentials.user.uid)
             contacts.then(contact => { 
-            contact.forEach((doc)=>{
-                getPhoneNumbersContacts(doc.data()["contact"])
+                contact.forEach((doc)=>{
+                    getPhoneNumbersContacts(doc.data()["contact"])
+                    getContactIdRedux(doc.id)
             })
             
         }).catch(err=>console.log(err))
