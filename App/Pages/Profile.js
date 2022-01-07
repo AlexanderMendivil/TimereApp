@@ -8,8 +8,8 @@ import { auth } from '../model/firebase';
 import { useSelector, useDispatch } from 'react-redux';
 import {getActualUser, updateUser } from "../controler/profileController"
 import { User } from '../model/user';
-import {useUser} from '../actions/user_actions'
-
+import {useUser, getUserImage} from '../actions/user_actions'
+import { storageFirebase } from '../model/firebase';
 import * as ImagePicker from "expo-image-picker"
 
 export function Profile() {
@@ -17,14 +17,17 @@ export function Profile() {
     const [email, setEmail] = useState("")
     const [name, setName] = useState("")
     const [phoneNumber, setPhoneNumber] = useState("")
-    const [image, setImage] = useState({})
+    const [image, setImage] = useState("")
 
     const navigation = useNavigation()
     const userId = useSelector(state => state.userRedux.userId)
     const user = useSelector(state => state.userRedux.user)
+    const userImage = useSelector(state => state.userRedux.userImage)
     const dispatch = useDispatch()
-    const upUser = (user) => dispatch(useUser(user))
+    const fourthDispatch = useDispatch()
 
+    const upUser = (user) => dispatch(useUser(user))
+    const getImageUser = (image) => fourthDispatch(getUserImage(image))
     useEffect(()=>{
         getUser()
     },[])
@@ -39,11 +42,17 @@ export function Profile() {
 
         let pickerResult = await ImagePicker.launchImageLibraryAsync()
         
-        if(pickerResult.cancelled === true){
+        if(!pickerResult.cancelled){
+            const storage = storageFirebase.ref()
+            const reference = storage.child(`Users/${userId}.jpg`)
+            const img = await fetch(pickerResult.uri)
+            const bytes = await img.blob()
+            reference.put(bytes).then((snapshot)=>console.log("image uploaded"))
+            getImageUser(pickerResult.uri)
+        }else{
             return
-        }
 
-        setImage({localUri: pickerResult.uri})
+        }
     }    
 
     const getUser = () =>{
@@ -81,7 +90,7 @@ export function Profile() {
             <Text style={styles.subtext}>Aquí puedes ver y modificar la información de tu perfil.</Text>    
             <View style={styles.logoContainer}>
                 <Image style={styles.logo} source={
-                    image.localUri == null ? require("../assets/foto_perfil.jpeg") : {uri: image.localUri}}/>
+                    userImage === null ? require("../assets/foto_perfil.jpeg") : {uri: userImage}}/>
                 <FontAwesome5 name="camera" color="#FF3131" size={30} iconStyle={{marginRight: 20}} onPress={openImagePicker}/>
                 <StatusBar style="auto"/>
             </View>
