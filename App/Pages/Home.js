@@ -24,7 +24,8 @@ export function Home({navigation}) {
 
   const completeUser = useSelector(state => state.userRedux.user)
   const phoneNumbers = useSelector(state => state.contactRedux.contactsPhone)
-
+  const userImage = useSelector(state => state.userRedux.userImage)
+  
   useEffect(() => {
     (async () => {
       try {
@@ -66,7 +67,8 @@ export function Home({navigation}) {
         <Text style={styles.texto}>Bienvenida, {completeUser.name}</Text>
         </View>
         <View style={styles.container}>
-        <Image style={styles.image} source={require('../assets/foto_perfil.jpeg')}></Image>
+        <Image style={styles.image} source={
+                    userImage === null ? require("../assets/foto_perfil.jpeg") : {uri: userImage}}></Image>
         </View>
       </View>
 
