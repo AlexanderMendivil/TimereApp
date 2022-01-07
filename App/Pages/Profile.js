@@ -53,13 +53,15 @@ export function Profile() {
     }
      
     const updateCurrentUser = () =>{
-        if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)){
+        if(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email) && (/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im.test(phoneNumber) || phoneNumber === "")){ 
+           
             const myUser = new User(email,userId,name,phoneNumber)
             let updatedUser = updateUser(userId, JSON.parse(JSON.stringify(myUser)), email)
             updatedUser.then(()=>{alert("Perfil actualizado!")}).catch(err=>console.log(err))
             upUser(JSON.parse(JSON.stringify(myUser)))
+
         }else{
-            alert("Tú email es invalido.")
+            alert("Alguno de tus campos es invalido.")
 
         }
     }
