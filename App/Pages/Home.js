@@ -49,17 +49,21 @@ export function Home({navigation}) {
     for(let i= 0; i < tempArray.length; i++){
       arrayNumbers.push(tempArray[i].phoneNumber)
     }
-
-    const isAvailable = await SMS.isAvailableAsync();
-    if (isAvailable) {
-      const { result } = await SMS.sendSMSAsync(
-        arrayNumbers,
-        `Hola, soy ${completeUser.name}, necesito ayuda. Mensje enviado por TimereApp`
-      );
-    } else {
-      alert("No tiene servicios de SMS, no podrá avisar a sus contactos.")
+    if(arrayNumbers[0] === undefined){
+      alert("No tienes contactos.")
+      return
     }
-  }
+
+      const isAvailable = await SMS.isAvailableAsync();
+      if (isAvailable) {
+        const { result } = await SMS.sendSMSAsync(
+          arrayNumbers,
+          `Hola, soy ${completeUser.name}, necesito ayuda. Mensje enviado por TimereApp`
+          );
+        } else {
+          alert("No tiene servicios de SMS, no podrá avisar a sus contactos.")
+        }
+      }
   return (
     <View style={styles.container}>
       <View style={styles.user}>
